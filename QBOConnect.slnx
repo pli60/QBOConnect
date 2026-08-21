@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="QBODataLibrary/QBODataLibrary.csproj" />
+  <Project Path="QBOLibrary/QBOLibrary.csproj" />
+  <Project Path="QBOTestConsole/QBOTestConsole.csproj" />
+</Solution>
