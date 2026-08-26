@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="QBODataLibrary/QBODataLibrary.csproj" />
-  <Project Path="QBOLibrary/QBOLibrary.csproj" />
-  <Project Path="QBOTestConsole/QBOTestConsole.csproj" />
+  <Project Path="QBODataLibrary/QBODataLibrary.csproj" Id="7f8a1f03-2278-4f14-b6c2-23afa6370aca" />
+  <Project Path="QBOLibrary/QBOLibrary.csproj" Id="1019ed18-cfd9-4f25-9a39-b0937d6a1d3f" />
+  <Project Path="QBOTestConsole/QBOTestConsole.csproj" Id="1701ef36-6e62-478f-83f6-a437e492bb9c" />
 </Solution>

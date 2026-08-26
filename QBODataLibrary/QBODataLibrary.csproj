@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChangeConn.cs" />
+    <Compile Include="Db\IDataAccess.cs" />
+    <Compile Include="Db\SqlDb.cs" />
     <Compile Include="Models\QboLogDbModel.cs" />
     <Compile Include="Models\QboMapDbModel.cs" />
     <Compile Include="Models\QboTokenDbModel.cs" />
@@ -72,5 +74,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
