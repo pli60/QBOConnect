@@ -80,6 +80,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QboConfig.cs" />
     <Compile Include="QboSession.cs" />
+    <Compile Include="Services\IQboMapStore.cs" />
     <Compile Include="Services\QboAccount.cs" />
     <Compile Include="Services\QboCompany.cs" />
     <Compile Include="Services\QboCreditMemo.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Services\QboInvoice.cs" />
     <Compile Include="Services\QboItem.cs" />
     <Compile Include="Services\QboPayment.cs" />
+    <Compile Include="Services\QboRefResolver.cs" />
     <Compile Include="Services\QboTaxCode.cs" />
     <Compile Include="Services\QboTerm.cs" />
   </ItemGroup>

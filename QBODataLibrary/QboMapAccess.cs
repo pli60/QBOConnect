@@ -1,13 +1,14 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using QBODataLibrary.Db;
 using QBODataLibrary.Models;
 using QBOLibrary;
+using QBOLibrary.Services;
 
 namespace QBODataLibrary
 {
-    public class QboMapAccess
+    public class QboMapAccess : IQboMapStore
     {
         private readonly IDataAccess _dataAccess;
 
@@ -48,6 +49,7 @@ namespace QBODataLibrary
                 ?? new List<QboMapDbModel>();
         }
 
+        // IQboMapStore
         public string GetQboId(string entity, string limsKey)
         {
             string qy = @"select QBO_ID
@@ -60,6 +62,22 @@ namespace QBODataLibrary
                 new { environment = QboConfig.Environment, entity = entity, limskey = limsKey });
 
             return rows?.FirstOrDefault();
+        }
+
+        // IQboMapStore
+        public void Upsert(string entity, string limsKey, string limsName,
+                           string qboId, string qboName, string matchStatus, string updatedBy)
+        {
+            Upsert(new QboMapDbModel
+            {
+                Entity = entity,
+                Lims_key = limsKey,
+                Lims_name = limsName,
+                Qbo_id = qboId,
+                Qbo_name = qboName,
+                Match_status = matchStatus,
+                Updated_by = updatedBy
+            });
         }
 
         public void Upsert(QboMapDbModel map)
@@ -88,13 +106,13 @@ namespace QBODataLibrary
                 new
                 {
                     environment = QboConfig.Environment,
-                    entity = map.Entity,
-                    limskey = map.Lims_key,
-                    limsname = map.Lims_name,
-                    qboid = map.Qbo_id,
-                    qboname = map.Qbo_name,
+                    entity      = map.Entity,
+                    limskey     = map.Lims_key,
+                    limsname    = map.Lims_name,
+                    qboid       = map.Qbo_id,
+                    qboname     = map.Qbo_name,
                     matchstatus = map.Match_status,
-                    updatedby = map.Updated_by
+                    updatedby   = map.Updated_by
                 },
                 CommandType.Text);
         }
