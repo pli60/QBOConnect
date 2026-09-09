@@ -27,6 +27,12 @@ namespace QBOLibrary.Services
                 "MetaData.LastUpdatedTime");
         }
 
+        // Full invoice list for the post-conversion remap - paged, ordered by Id
+        public Task<QboResultModel<List<QboInvoiceModel>>> QueryAllAsync()
+        {
+            return QboEntityHelper.QueryPagedAsync<QboInvoiceModel>(_http, Entity, null, "Id");
+        }
+
         public Task<QboResultModel<List<QboInvoiceModel>>> QueryByCustomerAsync(string customerId)
         {
             return QboEntityHelper.QueryPagedAsync<QboInvoiceModel>(
@@ -51,6 +57,24 @@ namespace QBOLibrary.Services
         {
             return QboEntityHelper.QueryFirstAsync<QboInvoiceModel>(
                 _http, Entity, "DocNumber = " + QboQuery.Literal(docNumber), docNumber);
+        }
+
+        // Desktop QueryQBNewInvoices - by creation date
+        public Task<QboResultModel<List<QboInvoiceModel>>> QueryCreatedBetweenAsync(DateTime from, DateTime to)
+        {
+            string where = "MetaData.CreateTime >= " + QboQuery.Date(from)
+                         + " and MetaData.CreateTime <= " + QboQuery.Date(to.AddDays(1));
+            return QboEntityHelper.QueryPagedAsync<QboInvoiceModel>(
+                _http, Entity, where, "MetaData.CreateTime");
+        }
+
+        // Desktop QueryQBModifiedInvoices - by last modified date
+        public Task<QboResultModel<List<QboInvoiceModel>>> QueryModifiedBetweenAsync(DateTime from, DateTime to)
+        {
+            string where = "MetaData.LastUpdatedTime >= " + QboQuery.Date(from)
+                         + " and MetaData.LastUpdatedTime <= " + QboQuery.Date(to.AddDays(1));
+            return QboEntityHelper.QueryPagedAsync<QboInvoiceModel>(
+                _http, Entity, where, "MetaData.LastUpdatedTime");
         }
 
         public async Task<QboResultModel<QboInvoiceModel>> GetByIdAsync(string id)

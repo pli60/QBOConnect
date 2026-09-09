@@ -55,6 +55,7 @@
     <Compile Include="Http\QboQuery.cs" />
     <Compile Include="Models\QboAccountModel.cs" />
     <Compile Include="Models\QboAddressModel.cs" />
+    <Compile Include="Models\QboClassModel.cs" />
     <Compile Include="Models\QboCompanyInfoModel.cs" />
     <Compile Include="Models\QboCreditMemoModel.cs" />
     <Compile Include="Models\QboCustomerModel.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="QboSession.cs" />
     <Compile Include="Services\IQboMapStore.cs" />
     <Compile Include="Services\QboAccount.cs" />
+    <Compile Include="Services\QboClass.cs" />
     <Compile Include="Services\QboCompany.cs" />
     <Compile Include="Services\QboCreditMemo.cs" />
     <Compile Include="Services\QboCustomer.cs" />

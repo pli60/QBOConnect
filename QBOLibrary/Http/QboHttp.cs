@@ -72,7 +72,8 @@ namespace QBOLibrary.Http
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     result = QboResultModel<JObject>.Fail(0, "NO_TOKEN",
-                        "No valid QuickBooks Online access token is available. Reconnect the company.");
+                        _auth.LastAuthError
+                        ?? "No valid QuickBooks Online access token is available. Reconnect the company.");
                     break;
                 }
 

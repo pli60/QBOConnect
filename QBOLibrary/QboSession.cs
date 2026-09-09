@@ -20,6 +20,7 @@ namespace QBOLibrary
         public QboAccount Accounts { get; }
         public QboItem Items { get; }
         public QboTaxCode TaxCodes { get; }
+        public QboClass Classes { get; }
 
         public QboSession(IQboTokenStore tokenStore, IQboLogStore logStore)
         {
@@ -36,6 +37,7 @@ namespace QBOLibrary
             Accounts = new QboAccount(Http);
             Items = new QboItem(Http);
             TaxCodes = new QboTaxCode(Http);
+            Classes = new QboClass(Http);
         }
     }
 }

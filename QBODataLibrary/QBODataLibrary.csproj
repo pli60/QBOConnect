@@ -47,6 +47,8 @@
     <Compile Include="ChangeConn.cs" />
     <Compile Include="Db\IDataAccess.cs" />
     <Compile Include="Db\SqlDb.cs" />
+    <Compile Include="Models\QboAppConfigAccess.cs" />
+    <Compile Include="Models\QboAppDbModel.cs" />
     <Compile Include="Models\QboLogDbModel.cs" />
     <Compile Include="Models\QboMapDbModel.cs" />
     <Compile Include="Models\QboTokenDbModel.cs" />

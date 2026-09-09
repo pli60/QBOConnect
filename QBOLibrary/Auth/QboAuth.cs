@@ -23,6 +23,8 @@ namespace QBOLibrary.Auth
         private QboTokenModel _cached;
 
         public string Owner { get; }
+        // Surfaces why a refresh failed instead of returning a bare null
+        public string LastAuthError { get; private set; }
 
         static QboAuth()
         {
@@ -94,6 +96,7 @@ namespace QBOLibrary.Auth
             QboTokenModel token = _tokenStore.Get();
             if (token == null)
             {
+                LastAuthError = "No QBO_TOKEN row for environment " + QboConfig.Environment + ".";
                 return null;
             }
             if (token.IsAccessValid)
@@ -109,6 +112,9 @@ namespace QBOLibrary.Auth
                 token = _tokenStore.Get();
                 if (token == null || !token.IsRefreshValid)
                 {
+                    LastAuthError = token == null
+                        ? "No QBO_TOKEN row."
+                        : "Refresh token expired on " + token.RefreshExpires + ".";
                     return null;
                 }
                 if (token.IsAccessValid)
@@ -124,12 +130,14 @@ namespace QBOLibrary.Auth
                         QboResultModel<QboTokenModel> refreshed = await RefreshAsync(token).ConfigureAwait(false);
                         if (!refreshed.Success)
                         {
+                            LastAuthError = "Refresh rejected: " + refreshed.FullError;
                             _tokenStore.ReleaseLock(Owner);
                             return null;
                         }
 
                         _tokenStore.SaveRefreshed(refreshed.Data, Owner);
                         _cached = refreshed.Data;
+                        LastAuthError = null;
                         return refreshed.Data.AccessToken;
                     }
                     catch
@@ -150,6 +158,7 @@ namespace QBOLibrary.Auth
                         return token.AccessToken;
                     }
                 }
+                LastAuthError = "Another process held the refresh lock and no new token appeared.";
                 return null;
             }
             finally
@@ -165,11 +174,11 @@ namespace QBOLibrary.Auth
                 { "grant_type", "refresh_token" },
                 { "refresh_token", current.RefreshToken }
             };
-            return PostTokenAsync(form, current.RealmId);
+            return PostTokenAsync(form, current.RealmId, current.RefreshExpires);
         }
 
         private async Task<QboResultModel<QboTokenModel>> PostTokenAsync(
-            Dictionary<string, string> form, string realmId)
+            Dictionary<string, string> form, string realmId, DateTime? existingRefreshExpires = null)
         {
             string basic = Convert.ToBase64String(
                 Encoding.UTF8.GetBytes(QboConfig.ClientId + ":" + QboConfig.ClientSecret));
@@ -214,9 +223,10 @@ namespace QBOLibrary.Auth
                             AccessToken = accessToken,
                             AccessExpires = DateTime.Now.AddSeconds(expiresIn),
                             RefreshToken = refreshToken,
+                            // Intuit omits this on some refresh responses - keep the known value
                             RefreshExpires = refreshExpiresIn > 0
                                 ? DateTime.Now.AddSeconds(refreshExpiresIn)
-                                : (DateTime?)null
+                                : existingRefreshExpires
                         };
 
                         return QboResultModel<QboTokenModel>.Ok(token, (int)response.StatusCode, null, text);

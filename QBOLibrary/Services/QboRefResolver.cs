@@ -16,6 +16,7 @@ namespace QBOLibrary.Services
         public const string EntityAccount = "ACCOUNT";
         public const string EntityTaxCode = "TAXCODE";
         public const string EntityCustomerType = "CUSTOMERTYPE";
+        public const string EntityClass = "CLASS";
 
         private readonly QboSession _session;
         private readonly IQboMapStore _mapStore;
@@ -25,6 +26,7 @@ namespace QBOLibrary.Services
         private Dictionary<string, QboAccountModel> _accounts;
         private Dictionary<string, QboTaxCodeModel> _taxCodes;
         private Dictionary<string, QboCustomerTypeModel> _customerTypes;
+        private Dictionary<string, QboClassModel> _classes;
 
         private DateTime _loadedOn = DateTime.MinValue;
 
@@ -83,6 +85,12 @@ namespace QBOLibrary.Services
                 LastError = typeResult.FullError;
                 return QboResultModel<bool>.FromFailure(typeResult);
             }
+
+            // Classes need QBO Plus or Advanced - an empty list is not fatal
+            var classResult = await _session.Classes.QueryActiveAsync().ConfigureAwait(false);
+            _classes = classResult.Success
+                ? BuildIndex(classResult.Data, c => c.FullyQualifiedName, c => c.Name)
+                : new Dictionary<string, QboClassModel>(StringComparer.OrdinalIgnoreCase);
 
             _items = BuildIndex(itemResult.Data, i => i.FullyQualifiedName, i => i.Name);
             _terms = BuildIndex(termResult.Data, t => t.Name, t => t.Name);
@@ -155,6 +163,19 @@ namespace QBOLibrary.Services
             QboCustomerTypeModel type = Lookup(_customerTypes, name);
             return type == null ? null : new QboRefModel(type.Id, type.Name);
         }
+
+        public QboRefModel ClassRef(string name)
+        {
+            QboClassModel qboClass = Lookup(_classes, name);
+            if (qboClass == null)
+            {
+                LastError = "Class '" + name + "' was not found in QuickBooks Online.";
+                return null;
+            }
+            return new QboRefModel(qboClass.Id, qboClass.Name);
+        }
+
+        public bool HasClasses => _classes != null && _classes.Count > 0;
 
         // ---- customer ---------------------------------------------------
 
@@ -236,6 +257,12 @@ namespace QBOLibrary.Services
             {
                 _mapStore.Upsert(EntityCustomerType, type.Name, type.Name,
                                  type.Id, type.Name, "MATCHED", updatedBy);
+                written++;
+            }
+            foreach (QboClassModel qboClass in _classes.Values.Distinct())
+            {
+                _mapStore.Upsert(EntityClass, qboClass.Name, qboClass.FullyQualifiedName,
+                                 qboClass.Id, qboClass.Name, "MATCHED", updatedBy);
                 written++;
             }
 
